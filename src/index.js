@@ -3,11 +3,11 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const taskRoutes = require('./routes/tasks');
 
 // Load environment variables
 dotenv.config();
 
-// Create Express app
 const app = express();
 
 // CORS configuration
@@ -22,18 +22,16 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// MongoDB Connection
-console.log('Attempting to connect to MongoDB...');
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB successfully!'))
-  .catch((err) => {
-    console.error('MongoDB connection error:', err);
-    console.log('MongoDB URI:', process.env.MONGODB_URI.replace(/:[^:]*@/, ':****@')); // Hide password in logs
-  });
-
 // Routes
-const taskRoutes = require('./routes/tasks');
 app.use('/api/tasks', taskRoutes);
+
+// Connect to MongoDB
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log('Connected to MongoDB successfully!'))
+.catch(err => console.error('MongoDB connection error:', err));
 
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {
@@ -50,8 +48,12 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Something went wrong!' });
 });
 
-// Start server
-const PORT = process.env.PORT || 5003;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-}); 
+// Only start the server if this file is run directly
+if (require.main === module) {
+  const PORT = process.env.PORT || 5003;
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}
+
+module.exports = app; 
