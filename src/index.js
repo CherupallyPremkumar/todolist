@@ -25,9 +25,13 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 // MongoDB Connection
+console.log('Attempting to connect to MongoDB...');
 mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch((err) => console.error('MongoDB connection error:', err));
+  .then(() => console.log('Connected to MongoDB successfully!'))
+  .catch((err) => {
+    console.error('MongoDB connection error:', err);
+    console.log('MongoDB URI:', process.env.MONGODB_URI.replace(/:[^:]*@/, ':****@')); // Hide password in logs
+  });
 
 // Routes
 const taskRoutes = require('./routes/tasks');
