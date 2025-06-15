@@ -12,11 +12,12 @@ const app = express();
 
 // CORS configuration
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://your-frontend-domain.vercel.app'] // We'll update this with your Vercel domain later
-    : 'http://localhost:3000',
-  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  origin: [
+    'http://localhost:3000',
+    'https://todolistclient.vercel.app', // Add your Vercel frontend URL here
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
 };
 
 // Middleware
