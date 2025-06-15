@@ -12,11 +12,9 @@ const app = express();
 
 // CORS configuration
 const corsOptions = {
-  origin: [
-    'http://localhost:3000',
-    'https://todolistclient.vercel.app', // Add your Vercel frontend URL here
-  ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  origin: '*',  // Allow all origins for development
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 };
 
