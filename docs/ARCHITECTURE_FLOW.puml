@@ -1,0 +1,117 @@
+@startuml
+!theme plain
+skinparam backgroundColor white
+skinparam handwritten false
+
+' Define components
+package "Frontend (Vercel)" {
+    [React App] as frontend
+    [TodoList Component] as todoList
+    [Task Form] as taskForm
+    [Task Item] as taskItem
+}
+
+package "Backend (Render)" {
+    [Express Server] as server
+    [Task Routes] as routes
+    [Task Controller] as controller
+    [Task Model] as model
+}
+
+database "MongoDB Atlas" {
+    [Tasks Collection] as tasks
+}
+
+' Define relationships
+frontend --> server : HTTP Requests
+server --> frontend : HTTP Responses
+
+todoList --> taskForm : Renders
+todoList --> taskItem : Renders
+
+server --> routes : Uses
+routes --> controller : Uses
+controller --> model : Uses
+model --> tasks : CRUD Operations
+
+' Add sequence for task creation
+sequence "Task Creation Flow" {
+    taskForm -> server : POST /api/tasks
+    server -> routes : Route Handler
+    routes -> controller : createTask()
+    controller -> model : new Task()
+    model -> tasks : save()
+    tasks --> model : Saved Task
+    model --> controller : Task Object
+    controller --> routes : Response
+    routes --> server : JSON Response
+    server --> frontend : 201 Created
+}
+
+' Add sequence for task retrieval
+sequence "Task Retrieval Flow" {
+    todoList -> server : GET /api/tasks
+    server -> routes : Route Handler
+    routes -> controller : getTasks()
+    controller -> model : find()
+    model -> tasks : query
+    tasks --> model : Task List
+    model --> controller : Task Objects
+    controller --> routes : Response
+    routes --> server : JSON Response
+    server --> frontend : 200 OK
+}
+
+' Add sequence for task update
+sequence "Task Update Flow" {
+    taskItem -> server : PUT /api/tasks/:id
+    server -> routes : Route Handler
+    routes -> controller : updateTask()
+    controller -> model : findByIdAndUpdate()
+    model -> tasks : update
+    tasks --> model : Updated Task
+    model --> controller : Task Object
+    controller --> routes : Response
+    routes --> server : JSON Response
+    server --> frontend : 200 OK
+}
+
+' Add sequence for task deletion
+sequence "Task Deletion Flow" {
+    taskItem -> server : DELETE /api/tasks/:id
+    server -> routes : Route Handler
+    routes -> controller : deleteTask()
+    controller -> model : findByIdAndDelete()
+    model -> tasks : delete
+    tasks --> model : Deletion Confirmation
+    model --> controller : Success
+    controller --> routes : Response
+    routes --> server : JSON Response
+    server --> frontend : 200 OK
+}
+
+' Add notes
+note right of frontend
+  React Components:
+  - TodoList
+  - TaskForm
+  - TaskItem
+end note
+
+note right of server
+  Express Middleware:
+  - CORS
+  - JSON Parser
+  - Error Handler
+end note
+
+note right of tasks
+  MongoDB Schema:
+  - title
+  - description
+  - completed
+  - createdAt
+  - updatedAt
+end note
+
+@enduml 
